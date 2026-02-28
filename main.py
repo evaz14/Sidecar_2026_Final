@@ -15,6 +15,18 @@ secondsLeftTeleop = 0
 secondsLeftAuton = 0
 data = ""
 
+# gopro (idk about this part)
+
+gopro = WirelessGoPro()
+
+def goProStartRecording():
+    with gopro:
+        gopro.http_command.set_shutter(shutter = WirelessGoPro.Shutter.ON)
+
+def goProStopRecording():
+    with gopro:
+        gopro.http_command.set_shutter(shutter = WirelessGoPro.Shutter.OFF)
+
 # visual gui
 window = tk.Tk() # create window
 window.geometry("1300x800") # size
@@ -88,17 +100,21 @@ def valueChanged(table, key, value, isNew):
         if value == 32:
             isEnabledStatusLabel.config(text = "DISABLED", bg = "red")
             GamePeriodLabel.config(text = "TELEOP")
+            threading.Thread(target=goProStopRecording, daemon=True).start()
         elif value == 33:
             isEnabledStatusLabel.config(text = "ENABLED", bg = "green")
             GamePeriodLabel.config(text = "TELEOP")
             threading.Thread(target=timerCountdownTeleop, daemon=True).start()
+            threading.Thread(target=goProStartRecording, daemon=True).start()
         elif value == 34:
             isEnabledStatusLabel.config(text = "DISABLED", bg = "red")
             GamePeriodLabel.config(text = "AUTON")
+            threading.Thread(target=goProStopRecording, daemon=True).start()
         elif value == 35:
             isEnabledStatusLabel.config(text = "ENABLED", bg = "green")
             GamePeriodLabel.config(text = "AUTON")
             threading.Thread(target=timerCountdownAuton, daemon=True).start()
+            threading.Thread(target=goProStartRecording, daemon=True).start()
     
     print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
 
