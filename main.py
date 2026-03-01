@@ -22,14 +22,16 @@ isTeleopStatus = False
 # def goProStartRecording():
 #     with gopro:
 #         gopro.http_command.set_shutter(shutter = WirelessGoPro.Shutter.ON)
+#     print("goPro has started recording")
 
 # def goProStopRecording():
 #     with gopro:
 #         gopro.http_command.set_shutter(shutter = WirelessGoPro.Shutter.OFF)
+#     print("goPro has stopped recording")
 
 # visual gui
 window = tk.Tk() # create window
-window.geometry("1300x800") # size
+window.geometry("1920x1080") # size
 window.title("Sidecar") # title
 
 # font
@@ -43,7 +45,7 @@ isEnabledStatusLabel = tk.Label(
     bg = "red",
     fg = "black"
 )
-isEnabledStatusLabel.place(x=350, y=25, height=200, width=600)
+isEnabledStatusLabel.place(relx=0.5, rely=0.2, height=200, width=600, anchor="center")
 
 # timer in game
 GameTimeLeftLabel = tk.Label(
@@ -53,7 +55,7 @@ GameTimeLeftLabel = tk.Label(
     bg = "light blue",
     fg = "black"
 )
-GameTimeLeftLabel.place(x=350, y=275, height=200, width=600)
+GameTimeLeftLabel.place(relx=0.5, rely=0.5, height=200, width=600, anchor = "center")
 
 # autnomous/teleoperated
 GamePeriodLabel = tk.Label(
@@ -63,7 +65,7 @@ GamePeriodLabel = tk.Label(
     bg = "light blue",
     fg = "black"
 )
-GamePeriodLabel.place(x=25, y=525, height=200, width=600)
+GamePeriodLabel.place(relx=0.25, rely=0.8, height=200, width=600, anchor = "center")
 
 # shift of the game, transition, scoring, etc.
 GameShiftLabel = tk.Label(
@@ -73,7 +75,7 @@ GameShiftLabel = tk.Label(
     bg = "light blue",
     fg = "black"
 )
-GameShiftLabel.place(x=650, y=525, height=200, width=600)
+GameShiftLabel.place(relx=0.75, rely=0.8, height=200, width=600, anchor = "center")
 
 # networktables
 def connectionListener(connected, info):
@@ -146,12 +148,6 @@ NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
 nt = NetworkTables.getTable("FMSInfo")
 nt.addEntryListener(valueChanged)
 
-winnerEntry = nt.getEntry("GameSpecificMessage")
-winner = winnerEntry.getString("")
-
-allianceEntry = nt.getEntry("isRedAlliance")
-alliance = allianceEntry.getBoolean(False)
-
 time.sleep(1)
 
 if NetworkTables.isConnected():
@@ -188,9 +184,11 @@ def periodic():
             GameTimeLeftLabel.config(text = str(secondsLeftTeleop - 30))
             if winner == "R" and alliance == True or winner == "B" and alliance == False:
                 GameShiftLabel.config(bg = "green", fg = "black")
-        elif 0 <= secondsLeftTeleop <= 30:
+        elif 0 < secondsLeftTeleop <= 30:
             GameShiftLabel.config(text = "Endgame", bg = "light blue", fg = "black")
             GameTimeLeftLabel.config(text = str(secondsLeftTeleop))
+        elif 0 == secondsLeftTeleop:
+            GameShiftLabel.config(text="Teleoperated")
     else:
         if secondsLeftAuton >= 0:
             GameShiftLabel.config(text = "Autonomous", bg = "light blue", fg = "black")
